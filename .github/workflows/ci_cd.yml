@@ -1,0 +1,47 @@
+name: CI/CD to Azure Container Registry
+
+env:
+  AZURE_CONTAINER_REGISTRY: epamacr.azurecr.io
+  AZURE_CONTAINER_REGISTRY_USERNAME: epamacr
+  IMAGE_NAME: webapp
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out source code
+      uses: actions/checkout@v3
+
+    - name: Set up Java 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: 'adopt'
+
+    - name: Run Maven build
+      run: |
+        mvn --batch-mode --update-snapshots verify
+
+    - name: Upload Maven build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: artifact
+        path: target/${{ env.IMAGE_NAME }}-0.0.1-SNAPSHOT.jar
+
+    - name: Log in to Azure Container Registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ env.AZURE_CONTAINER_REGISTRY }}
+        username: ${{ env.AZURE_CONTAINER_REGISTRY_USERNAME }}
+        password: ${{ secrets.WEBAPPSECRET }}
+
+    - name: Build and push Docker image to Azure Container Registry
+      run: |
+        docker build . -t ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest -t ${{env.AZURE_CONTAINER_REGISTRY}}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest

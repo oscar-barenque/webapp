@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>WebApp</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/5.1.3/css/bootstrap.min.css" />
+</head>
+<body>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center">Welcome to Web App!</h1>
+            <button class="btn btn-primary mt-4" id="clickButton">Click Me!</button>
+            <h2 class="mt-4 text-center" id="message" style="display: none;">Hello, World!</h2>
+        </div>
+    </div>
+</div>
+<script src="/webjars/jquery/3.6.1/jquery.min.js"></script>
+<script src="/webjars/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById("clickButton").onclick = function() {
+        var messageElement = document.getElementById("message");
+        messageElement.style.display = "block";
+    };
+</script>
+</body>
+</html>
